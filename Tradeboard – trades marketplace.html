@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tradeboard – Hire plumbers, carpenters and welders</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&display=swap">
+<style>
+:root{
+  --paper:#f3f5f7; --surface:#ffffff; --ink:#14202b; --muted:#566574; --line:#d3dbe2;
+  --blue:#0f2a47; --blueink:#eaf1f8; --spark:#e8590c; --sparkink:#ffffff; --ok:#1d7a46;
+  color-scheme:light; box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#0d141b; --surface:#16212b; --ink:#e8eef3; --muted:#9db0c0; --line:#2a3946;
+    --blue:#0a1c31; --blueink:#eaf1f8; --spark:#ff7a2e; --sparkink:#14202b; --ok:#4cc58a; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0d141b; --surface:#16212b; --ink:#e8eef3; --muted:#9db0c0; --line:#2a3946;
+  --blue:#0a1c31; --blueink:#eaf1f8; --spark:#ff7a2e; --sparkink:#14202b; --ok:#4cc58a; color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 Barlow,system-ui,sans-serif}
+h1,h2,h3{font-family:"Barlow Condensed","Arial Narrow",sans-serif;line-height:1.05;margin:0;letter-spacing:.01em}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--spark);outline-offset:2px}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+
+/* hero: blueprint sheet */
+.hero{background:var(--blue);color:var(--blueink);position:relative;overflow:hidden;
+  background-image:linear-gradient(rgba(255,255,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.07) 1px,transparent 1px);
+  background-size:32px 32px}
+.nav{display:flex;justify-content:space-between;align-items:center;padding:18px 0}
+.logo{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:1.6rem;text-decoration:none}
+.logo b{color:var(--spark)}
+.ghost{background:none;border:1px solid rgba(255,255,255,.4);color:inherit;padding:8px 14px;border-radius:4px;font:inherit;cursor:pointer}
+.hero h1{font-size:clamp(2.6rem,8vw,5.2rem);font-weight:700;max-width:12ch;padding:36px 0 14px}
+.hero p{max-width:46ch;margin:0 0 28px;font-size:1.1rem;opacity:.9}
+.search{display:grid;grid-template-columns:1fr 1fr auto;gap:0;max-width:720px;margin-bottom:56px;border-radius:4px;overflow:hidden}
+.search input,.search select{padding:15px 14px;border:0;font:inherit;background:var(--surface);color:var(--ink);min-width:0;border-right:1px solid var(--line)}
+.search button{background:var(--spark);color:var(--sparkink);border:0;font:600 1rem Barlow,sans-serif;padding:0 26px;cursor:pointer}
+@media(max-width:620px){.search{grid-template-columns:1fr}.search button{padding:14px}}
+
+/* trades */
+.chips{display:flex;gap:10px;flex-wrap:wrap;padding:26px 0 10px}
+.chip{border:2px solid var(--ink);background:transparent;color:var(--ink);padding:8px 18px;border-radius:999px;font:600 1rem Barlow,sans-serif;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.count{color:var(--muted);margin:6px 0 18px}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:18px;padding-bottom:50px}
+.card{background:var(--surface);border:1px solid var(--line);border-left:6px solid var(--c);padding:18px;display:flex;flex-direction:column;gap:10px}
+.card[data-trade="Plumber"]{--c:#2b7bbf}
+.card[data-trade="Carpenter"]{--c:#a86a2c}
+.card[data-trade="Welder"]{--c:var(--spark)}
+.top{display:flex;gap:14px;align-items:center}
+.av{width:52px;height:52px;border-radius:50%;background:var(--c);color:#fff;display:grid;place-items:center;font:700 1.3rem "Barlow Condensed",sans-serif;flex:none}
+.card h3{font-size:1.5rem}
+.sub{color:var(--muted);font-size:.92rem}
+.meta{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.95rem}
+.tags{display:flex;gap:6px;flex-wrap:wrap}
+.tag{background:var(--paper);border:1px solid var(--line);padding:2px 9px;font-size:.84rem;border-radius:3px}
+.avail{color:var(--ok);font-weight:600}.avail.busy{color:var(--muted)}
+.foot{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:8px;border-top:1px dashed var(--line)}
+.rate{font:700 1.4rem "Barlow Condensed",sans-serif}
+.btn{background:var(--spark);color:var(--sparkink);border:0;padding:10px 16px;border-radius:4px;font:600 1rem Barlow,sans-serif;cursor:pointer}
+.empty{grid-column:1/-1;padding:30px;border:2px dashed var(--line);text-align:center;color:var(--muted)}
+
+/* how it works */
+.how{background:var(--surface);border-block:1px solid var(--line);padding:44px 0}
+.how h2{font-size:2.2rem;margin-bottom:20px}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:24px;margin:0;padding:0;list-style:none;counter-reset:s}
+.steps li{counter-increment:s;padding-left:50px;position:relative}
+.steps li::before{content:counter(s);position:absolute;left:0;top:0;width:36px;height:36px;border:2px solid var(--spark);color:var(--spark);display:grid;place-items:center;font:700 1.3rem "Barlow Condensed",sans-serif}
+.steps b{display:block;font-size:1.1rem}
+footer{padding:30px 0;color:var(--muted);font-size:.9rem}
+
+/* dialog */
+dialog{border:0;padding:0;max-width:440px;width:calc(100% - 32px);background:var(--surface);color:var(--ink);border-top:6px solid var(--spark)}
+dialog::backdrop{background:rgba(5,12,20,.65)}
+dialog form{padding:22px;display:grid;gap:12px}
+dialog h2{font-size:1.9rem}
+label{display:grid;gap:4px;font-weight:600;font-size:.93rem}
+dialog input,dialog select,dialog textarea{font:inherit;padding:10px;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:3px}
+.row{display:flex;gap:10px;justify-content:flex-end;margin-top:4px}
+.row .cancel{background:none;border:1px solid var(--line);color:var(--ink)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:12px 20px;border-radius:4px;opacity:0;pointer-events:none;transition:opacity .25s;z-index:20}
+.toast.on{opacity:1}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<header class="hero">
+  <div class="wrap">
+    <nav class="nav">
+      <a class="logo" href="#top">Trade<b>board</b></a>
+      <button class="ghost" id="join">Join as a pro</button>
+    </nav>
+    <h1 id="top">Skilled hands, hired by the job.</h1>
+    <p>Find plumbers, carpenters and welders near you. Compare rates and reviews, then send a quote request in under a minute.</p>
+    <form class="search" id="searchForm" role="search">
+      <input id="q" type="search" placeholder="Search a name or skill, e.g. pipe leak" aria-label="Search by name or skill">
+      <select id="city" aria-label="City"><option value="">All cities</option></select>
+      <button type="submit">Find a pro</button>
+    </form>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="chips" id="chips" role="group" aria-label="Filter by trade">
+    <button class="chip" data-t="" aria-pressed="true">All trades</button>
+    <button class="chip" data-t="Plumber" aria-pressed="false">Plumbers</button>
+    <button class="chip" data-t="Carpenter" aria-pressed="false">Carpenters</button>
+    <button class="chip" data-t="Welder" aria-pressed="false">Welders</button>
+  </div>
+  <div class="count" id="count" aria-live="polite"></div>
+  <section class="grid" id="grid"></section>
+</main>
+
+<section class="how">
+  <div class="wrap">
+    <h2>How hiring works</h2>
+    <ol class="steps">
+      <li><b>Pick a trade</b>Filter by plumbing, carpentry or welding and your city.</li>
+      <li><b>Request a quote</b>Describe the job. The pro replies with a price and a date.</li>
+      <li><b>Agree and book</b>Confirm the details with the pro, then review the work after.</li>
+    </ol>
+  </div>
+</section>
+<footer><div class="wrap">Tradeboard is a demo marketplace. Profiles shown are sample data.</div></footer>
+
+<dialog id="dlg" aria-labelledby="dtitle">
+  <form method="dialog" id="quoteForm">
+    <h2 id="dtitle">Request a quote</h2>
+    <label>Your name<input name="name" required autocomplete="name"></label>
+    <label>Phone number<input name="phone" type="tel" required autocomplete="tel"></label>
+    <label>Describe the job<textarea name="job" rows="3" required placeholder="What needs doing, and where?"></textarea></label>
+    <div class="row">
+      <button type="button" class="btn cancel" id="cancel">Cancel</button>
+      <button type="submit" class="btn">Send request</button>
+    </div>
+  </form>
+</dialog>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const PROS=[
+ {n:"Chinedu Okafor",t:"Plumber",c:"Port Harcourt",r:6500,s:4.8,j:132,a:1,k:["Pipe leaks","Water heaters","Borehole fittings"]},
+ {n:"Blessing Amadi",t:"Plumber",c:"Lagos",r:8000,s:4.9,j:210,a:1,k:["Bathroom fit-out","Drainage","Pumps"]},
+ {n:"Tunde Bello",t:"Plumber",c:"Abuja",r:7000,s:4.5,j:77,a:0,k:["Septic systems","Leak repair"]},
+ {n:"Emeka Nwosu",t:"Carpenter",c:"Port Harcourt",r:7500,s:4.7,j:95,a:1,k:["Wardrobes","Doors","Roof trusses"]},
+ {n:"Grace Effiong",t:"Carpenter",c:"Lagos",r:9000,s:5.0,j:64,a:0,k:["Kitchen cabinets","Custom furniture"]},
+ {n:"Yakubu Danjuma",t:"Carpenter",c:"Abuja",r:6800,s:4.6,j:118,a:1,k:["Window frames","Shelving","Repairs"]},
+ {n:"Ibrahim Musa",t:"Welder",c:"Abuja",r:8500,s:4.8,j:150,a:1,k:["Gates","Steel frames","Burglar proofing"]},
+ {n:"Samuel Ekpo",t:"Welder",c:"Port Harcourt",r:9500,s:4.9,j:188,a:1,k:["Pipeline welding","Fabrication","Tanks"]},
+ {n:"Ngozi Eze",t:"Welder",c:"Lagos",r:8800,s:4.4,j:52,a:0,k:["Railings","Carports","Repairs"]}
+];
+const $=s=>document.querySelector(s);
+let trade="";
+const cities=[...new Set(PROS.map(p=>p.c))].sort();
+cities.forEach(c=>$("#city").add(new Option(c,c)));
+const naira=n=>"₦"+n.toLocaleString("en-NG");
+const esc=s=>s.replace(/[&<>"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m]));
+
+function render(){
+  const q=$("#q").value.trim().toLowerCase(), city=$("#city").value;
+  const list=PROS.filter(p=>(!trade||p.t===trade)&&(!city||p.c===city)&&
+    (!q||(p.n+" "+p.t+" "+p.k.join(" ")).toLowerCase().includes(q)))
+    .sort((a,b)=>b.s-a.s);
+  $("#count").textContent=list.length+(list.length===1?" pro found":" pros found");
+  $("#grid").innerHTML=list.length?list.map(p=>`
+    <article class="card" data-trade="${p.t}">
+      <div class="top"><div class="av" aria-hidden="true">${p.n.split(" ").map(w=>w[0]).join("")}</div>
+        <div><h3>${esc(p.n)}</h3><div class="sub">${p.t} in ${p.c}</div></div></div>
+      <div class="meta"><span>★ ${p.s.toFixed(1)} (${p.j} jobs)</span>
+        <span class="avail ${p.a?"":"busy"}">${p.a?"Available this week":"Booked this week"}</span></div>
+      <div class="tags">${p.k.map(k=>`<span class="tag">${k}</span>`).join("")}</div>
+      <div class="foot"><span class="rate">${naira(p.r)} <span class="sub">/ hour</span></span>
+        <button class="btn" data-name="${esc(p.n)}">Request quote</button></div>
+    </article>`).join(""):
+    `<div class="empty">No pros match. Clear the search or choose another city.</div>`;
+}
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("on");setTimeout(()=>t.classList.remove("on"),2800)}
+
+$("#chips").addEventListener("click",e=>{
+  const b=e.target.closest(".chip");if(!b)return;
+  trade=b.dataset.t;
+  document.querySelectorAll(".chip").forEach(c=>c.setAttribute("aria-pressed",c===b));
+  render();
+});
+$("#searchForm").addEventListener("submit",e=>{e.preventDefault();render();$("#count").scrollIntoView({behavior:"smooth"})});
+$("#city").addEventListener("change",render);
+$("#q").addEventListener("input",render);
+
+const dlg=$("#dlg");let target="";
+$("#grid").addEventListener("click",e=>{
+  const b=e.target.closest("button[data-name]");if(!b)return;
+  target=b.dataset.name;$("#dtitle").textContent="Request a quote from "+target;dlg.showModal();
+});
+$("#join").addEventListener("click",()=>{target="";$("#dtitle").textContent="Join Tradeboard";dlg.showModal()});
+$("#cancel").addEventListener("click",()=>dlg.close());
+$("#quoteForm").addEventListener("submit",()=>{
+  toast(target?"Quote request sent to "+target+".":"Thanks. We will contact you to set up your profile.");
+  $("#quoteForm").reset();
+});
+render();
+</script>
+</body>
+</html>
